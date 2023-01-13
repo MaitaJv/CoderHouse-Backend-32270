@@ -19,12 +19,12 @@ class ProductManager{
         this.products.push(product)
     }
     getProducts(){
-        return console.log(this.products);
+        return this.products;
     }
     getProductById(code){
         const productById = this.products.find(product => product.code == code)
         
-        productById ? console.log(productById) : console.log("Not found")
+        productById ? productById : "Not found"
     }
 }
 
