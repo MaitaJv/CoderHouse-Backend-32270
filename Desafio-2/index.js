@@ -27,13 +27,13 @@ class ProductManager {
 
                 console.log(product)
 
-                await fs.promises.writeFile(this.path, `${JSON.stringify(dataJS)}`, 'utf-8')        //se escribe en el archivo los productos en JSON
+                await fs.promises.writeFile(this.path, `${JSON.stringify(dataJS, null, 2)}`, 'utf-8')        //se escribe en el archivo los productos en JSON
 
             }else{                           //si el archivo NO existe se crea uno
                 product.id = 1
                 const arrProducts = [product]
 
-                await fs.promises.writeFile(this.path, `${JSON.stringify(arrProducts)}`, 'utf-8')   //se crea el archivo con el producto en JSON
+                await fs.promises.writeFile(this.path, `${JSON.stringify(arrProducts, null, 2)}`, 'utf-8')   //se crea el archivo con el producto en JSON
             }
         }
         catch(err) {
