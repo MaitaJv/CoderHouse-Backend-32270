@@ -5,7 +5,7 @@ import { Server } from 'socket.io'
 import productsRouter from './routes/products.js'
 import cartsRouter from './routes/carts.js'
 import viewsRouter from './routes/views.js'
-import __dirname from './utils.js'
+import __dirname from './config/utils.js'
 import { ProductManager } from './dao/fileSystem/productManager.js'
 import dbConnection from './config/dbConnection.js'
 import chatModel from "./models/chat.js"
