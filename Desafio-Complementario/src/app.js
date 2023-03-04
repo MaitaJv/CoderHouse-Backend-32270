@@ -6,9 +6,9 @@ import productsRouter from './routes/products.js'
 import cartsRouter from './routes/carts.js'
 import viewsRouter from './routes/views.js'
 import __dirname from './utils.js'
-import { ProductManager } from './fileSystem/productManager.js'
-import dbConnection from './dao/config/dbConnection.js'
-import chatModel from "./dao/models/chat.js"
+import { ProductManager } from './dao/fileSystem/productManager.js'
+import dbConnection from './config/dbConnection.js'
+import chatModel from "./models/chat.js"
 
 const app = express()
 const PORT = 8080

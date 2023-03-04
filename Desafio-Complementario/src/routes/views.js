@@ -1,6 +1,6 @@
 import { Router } from "express";
-import { ProductManager } from "../fileSystem/productManager.js"
-import chatModel from "../dao/models/chat.js"
+import { ProductManager } from "../dao/fileSystem/productManager.js"
+import chatModel from "../models/chat.js"
 
 const router = Router()
 

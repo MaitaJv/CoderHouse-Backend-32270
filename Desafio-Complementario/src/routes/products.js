@@ -1,6 +1,6 @@
 import { Router } from "express"
-import { ProductManager } from "../fileSystem/productManager.js"
-import productsModel from "../dao/models/products.js"
+import { ProductManager } from "../dao/fileSystem/productManager.js"
+import productsModel from "../models/products.js"
 
 const router = Router()
 
