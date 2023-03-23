@@ -15,8 +15,13 @@ export const initPassport = ()=>{
     })
 
     passport.deserializeUser(async (id, done)=>{
-        let user = await UserModel.findById(id)
-        done(null, user)
+        try {
+            let user = await UserModel.findById(id)
+            done(null, user)
+        } catch (error) {
+            console.log(error)
+            done(error)
+        }
     })
 
     passport.use('github', new GithubStrategy({
@@ -30,15 +35,14 @@ export const initPassport = ()=>{
         try {
             let user = await UserModel.findOne({email: profile._json.email})
             console.log(profile._json.email);
-            if (!user) { // si no existe el usuario lo agregamos a nuestra base de datos
+            if (!user) {
                 let newUser = {
                     first_name: profile.username,
-                    last_name: profile.username, // nos toca llenar los campos que no vienen desde el perfil de github
-                    // edad: 0, // nos toca llenar los campos que no vienen desde el perfil de github
+                    last_name: profile.username,
                     age: 18,
                     roll: 'user',
                     email: profile._json.email,
-                    password: '1234', //Al ser autenticación de terceros, no podemos asignar un password
+                    password: '1234'
                 }
                 let result= await UserModel.create(newUser)
                 return done(null, result)
@@ -52,7 +56,7 @@ export const initPassport = ()=>{
 
     passport.use('login', new LocalStrategy(
         {
-            usernameField: 'email'
+            usernameField: 'username'
         },
         async (username, password, done) => {
             console.log('login passport')

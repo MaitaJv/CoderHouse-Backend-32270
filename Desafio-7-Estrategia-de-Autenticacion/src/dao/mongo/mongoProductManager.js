@@ -13,7 +13,7 @@ export class MongoProductManager{
     async getProducts(limit, page, filtro){
         try {
             let products = await productsModel.paginate(filtro, {limit: 10, page: page, lean: true})
-            console.log(products)
+            // console.log(products)
             if (!limit) {
                 return products
             }

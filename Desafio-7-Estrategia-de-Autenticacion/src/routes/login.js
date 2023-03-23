@@ -11,18 +11,19 @@ const mongoUserManager = new MongoUserManager
 // Client ID: Iv1.b6ac1a5f856717dc
 // Secrect Client : de3844f079b2117ee877294638dd6e0d6d5ef1b2
 
-router.get('/', (req, res) => {
+router.get('/login', (req, res) => {
     res.render('login')
 })
 
 router.get('/register', (req, res) => {
     res.render('register')
 })
-//passport.authenticate('login', {failureRedirect: '/auth/faillogin'})
+
 router.post('/login', passport.authenticate('login', {failureRedirect: '/auth/faillogin'}), async (req, res) => {
     const { username, password } = req.body
 
     try {
+        
         if (username !== 'adminCoder@coder.com' || password !== 'adminCod3r123') {
             req.session.user = username
             req.session.admin = false
@@ -41,28 +42,18 @@ router.post('/login', passport.authenticate('login', {failureRedirect: '/auth/fa
     }
 })
 
-// console.log('/login')
-        // let user = await mongoUserManager.getUser(username)
-
-        // if (!user) {
-        //     res.send({status: 'error', message: 'Usuario no existe'})
-        // }
-
-        // if(!isValidPassword(user, password)){
-        //     res.send({status: 'error', message: 'Contraseña incorrecta'})
-        // }
-
 router.get('/faillogin', (req, res)=>{
     res.send({status: 'error', message: 'fallo el login'})
 })
 
 router.post('/register', userVali, passport.authenticate('register', {failureRedirect: '/auth/failregister'}), async (req, res)=>{
     try {
-        res.redirect('http://localhost:8080/auth')
+        res.redirect('http://localhost:8080/auth/login')
     } catch (error) {
         console.log(error)
     }
 })
+
 router.get('/failregister', (req, res)=>{
     res.send({status: 'error', message: 'fallo el registro'})
 })
@@ -70,7 +61,7 @@ router.get('/failregister', (req, res)=>{
 router.post('/logout', async (req, res) => {
     try {
         req.session.destroy(err => {
-            if(!err) res.redirect('http://localhost:8080/auth')
+            if(!err) res.redirect('http://localhost:8080/auth/login')
             else res.send({status:'Logout error', message: err})
         })
     } catch (error) {
