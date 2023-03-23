@@ -19,21 +19,10 @@ router.get('/register', (req, res) => {
     res.render('register')
 })
 //passport.authenticate('login', {failureRedirect: '/auth/faillogin'})
-router.post('/login', async (req, res) => {
+router.post('/login', passport.authenticate('login', {failureRedirect: '/auth/faillogin'}), async (req, res) => {
     const { username, password } = req.body
 
     try {
-        console.log('/login')
-        let user = await mongoUserManager.getUser(username)
-
-        if (!user) {
-            res.send({status: 'error', message: 'Usuario no existe'})
-        }
-
-        if(!isValidPassword(user, password)){
-            res.send({status: 'error', message: 'Contraseña incorrecta'})
-        }
-
         if (username !== 'adminCoder@coder.com' || password !== 'adminCod3r123') {
             req.session.user = username
             req.session.admin = false
@@ -51,6 +40,17 @@ router.post('/login', async (req, res) => {
         console.log(error)
     }
 })
+
+// console.log('/login')
+        // let user = await mongoUserManager.getUser(username)
+
+        // if (!user) {
+        //     res.send({status: 'error', message: 'Usuario no existe'})
+        // }
+
+        // if(!isValidPassword(user, password)){
+        //     res.send({status: 'error', message: 'Contraseña incorrecta'})
+        // }
 
 router.get('/faillogin', (req, res)=>{
     res.send({status: 'error', message: 'fallo el login'})

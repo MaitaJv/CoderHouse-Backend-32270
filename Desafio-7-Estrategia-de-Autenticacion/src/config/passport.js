@@ -55,12 +55,10 @@ export const initPassport = ()=>{
             usernameField: 'email'
         },
         async (username, password, done) => {
-            console.log('username: ',username);
-            console.log('password: ',password);
-            console.log('login correcto')
+            console.log('login passport')
             try {
                 let user = await mongoUserManager.getUser(username)
-
+                console.log(user)
                 if (!user) {
                     console.log('usuario no existe')
                     return done(null, false)
