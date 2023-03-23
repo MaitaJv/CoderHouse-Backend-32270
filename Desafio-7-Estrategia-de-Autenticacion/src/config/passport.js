@@ -1,4 +1,5 @@
 import passport from "passport";
+import GithubStrategy from 'passport-github2'
 import local from "passport-local"
 import { MongoUserManager } from "../dao/mongo/MongoUserManager.js";
 import { createHash, isValidPassword } from "../ultis/bcrypt.js";
@@ -8,50 +9,54 @@ const LocalStrategy = local.Strategy
 const mongoUserManager = new MongoUserManager
 
 export const initPassport = ()=>{
-    passport.use('register', new LocalStrategy(
-        {
-            passReqToCallback: true,
-            usernameField: 'email',
-        },
-        async (req, username, password, done)=>{
-            const { first_name, last_name, age, roll = 'user', email } = req.body
-            let user = { first_name, last_name, age, roll, email, password: createHash(password) }
 
-            try {
-                let exist = await mongoUserManager.getUser(username)
-                
-                if(exist) {
-                    console.log('el usuario ya existe')
-                    return done(null, false)
-                }else{
-                    console.log('el usuario se creo correctamente')
-                    let newUser = await mongoUserManager.addUser(user)
-                    return done(null, newUser)
-                }
-            } catch (error) {
-                console.log(error)
-                return done('Error al obrener el usuario'+error)
-            }
-        }
-    ))
-
-    passport.serializeUser((user, done) => {
-        console.log('serializeUser')
-        done(null, user._id)
+    passport.serializeUser((user, done)=>{
+        done(null, user.id)
     })
-    
-    passport.deserializeUser(async (id, done) => {
+
+    passport.deserializeUser(async (id, done)=>{
+        let user = await UserModel.findById(id)
+        done(null, user)
+    })
+
+    passport.use('github', new GithubStrategy({
+        clientID: 'Iv1.b6ac1a5f856717dc',
+        clientSecret: 'de3844f079b2117ee877294638dd6e0d6d5ef1b2',
+        callbackURL: 'http://localhost:8080/auth/githubcallback'
+    }, async (accessToken, refreshToken, profile, done)=>{
+        console.log('accessToken: ', accessToken)
+        console.log('refreshToken: ', refreshToken)
+        console.log('Profile: ',profile)
         try {
-            console.log('deserializeUser')
-            let user = await UserModel.findById(id)
-            done(null, user)
+            let user = await UserModel.findOne({email: profile._json.email})
+            console.log(profile._json.email);
+            if (!user) { // si no existe el usuario lo agregamos a nuestra base de datos
+                let newUser = {
+                    first_name: profile.username,
+                    last_name: profile.username, // nos toca llenar los campos que no vienen desde el perfil de github
+                    // edad: 0, // nos toca llenar los campos que no vienen desde el perfil de github
+                    age: 18,
+                    roll: 'user',
+                    email: profile._json.email,
+                    password: '1234', //Al ser autenticación de terceros, no podemos asignar un password
+                }
+                let result= await UserModel.create(newUser)
+                return done(null, result)
+            }
+            
+            return done(null, user)
         } catch (error) {
-            done(error)
+            return done(error)
         }
-    })
+    }))
 
-    passport.use('login', new LocalStrategy({usernameField: 'email'},
+    passport.use('login', new LocalStrategy(
+        {
+            usernameField: 'email'
+        },
         async (username, password, done) => {
+            console.log('username: ',username);
+            console.log('password: ',password);
             console.log('login correcto')
             try {
                 let user = await mongoUserManager.getUser(username)
@@ -67,7 +72,36 @@ export const initPassport = ()=>{
                 }
                 return done(null, user)
             } catch (error) {
+                console.log(error)
                 return done(error)
+            }
+        }
+    ))
+
+    passport.use('register', new LocalStrategy(
+        {
+            passReqToCallback: true,
+            usernameField: 'email',
+        },
+        async (req, username, password, done)=>{
+            const { first_name, last_name, age, roll = 'user', email } = req.body
+            let user = { first_name, last_name, age, roll, email, password: createHash(password) }
+            console.log('username: ',username);
+            console.log('password: ',password);
+            try {
+                let exist = await mongoUserManager.getUser(username)
+                
+                if(exist) {
+                    console.log('el usuario ya existe')
+                    return done(null, false)
+                }else{
+                    console.log('el usuario se creo correctamente')
+                    let result = await mongoUserManager.addUser(user)
+                    return done(null, result)
+                }
+            } catch (error) {
+                console.log(error)
+                return done('Error al obrener el usuario'+error)
             }
         }
     ))

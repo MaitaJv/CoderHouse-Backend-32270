@@ -8,6 +8,9 @@ const router = Router()
 
 const mongoUserManager = new MongoUserManager
 
+// Client ID: Iv1.b6ac1a5f856717dc
+// Secrect Client : de3844f079b2117ee877294638dd6e0d6d5ef1b2
+
 router.get('/', (req, res) => {
     res.render('login')
 })
@@ -15,11 +18,22 @@ router.get('/', (req, res) => {
 router.get('/register', (req, res) => {
     res.render('register')
 })
-
-router.post('/login', passport.authenticate('login', {failureRedirect: '/auth/faillogin'}), async (req, res) => {
+//passport.authenticate('login', {failureRedirect: '/auth/faillogin'})
+router.post('/login', async (req, res) => {
     const { username, password } = req.body
 
     try {
+        console.log('/login')
+        let user = await mongoUserManager.getUser(username)
+
+        if (!user) {
+            res.send({status: 'error', message: 'Usuario no existe'})
+        }
+
+        if(!isValidPassword(user, password)){
+            res.send({status: 'error', message: 'Contraseña incorrecta'})
+        }
+
         if (username !== 'adminCoder@coder.com' || password !== 'adminCod3r123') {
             req.session.user = username
             req.session.admin = false
@@ -37,13 +51,14 @@ router.post('/login', passport.authenticate('login', {failureRedirect: '/auth/fa
         console.log(error)
     }
 })
+
 router.get('/faillogin', (req, res)=>{
     res.send({status: 'error', message: 'fallo el login'})
 })
 
-router.post('/register', userVali, passport.authenticate('register', {failureRedirect: '/auth/failregister'}),  async (req, res)=>{
+router.post('/register', userVali, passport.authenticate('register', {failureRedirect: '/auth/failregister'}), async (req, res)=>{
     try {
-        res.send({status: 'ok', message: 'se registro correctamente'})
+        res.redirect('http://localhost:8080/auth')
     } catch (error) {
         console.log(error)
     }
@@ -62,6 +77,17 @@ router.post('/logout', async (req, res) => {
         console.log(error)
     }
 })
+
+router.get('/github', passport.authenticate('github',{scope: ['user:email']}))
+
+router.get('/githubcallback', passport.authenticate('github', {failureRedirect: '/login'}), async (req, res)=>{
+    console.log('req: ',req.user)
+    req.session.user = req.user.first_name
+    req.session.admin = false
+    req.session.usuario = true
+    res.redirect('http://localhost:8080/products')
+})
+
 
 
 export default router
