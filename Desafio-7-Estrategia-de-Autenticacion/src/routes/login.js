@@ -1,3 +1,4 @@
+import passport from "passport"
 import { Router } from "express"
 import { userVali } from "../middleware/userValidation.js"
 import { MongoUserManager } from "../dao/mongo/MongoUserManager.js"
@@ -15,21 +16,10 @@ router.get('/register', (req, res) => {
     res.render('register')
 })
 
-router.post('/login', async (req, res) => {
+router.post('/login', passport.authenticate('login', {failureRedirect: '/auth/faillogin'}), async (req, res) => {
     const { username, password } = req.body
 
     try {
-        
-        let user = await mongoUserManager.getUser(username)
-
-        if (!user) {
-            res.send({status: 'error', message: 'Usuario no existe'})
-        }
-
-        if(!isValidPassword(user, password)){
-            res.send({status: 'error', message: 'Contraseña incorrecta'})
-        }
-
         if (username !== 'adminCoder@coder.com' || password !== 'adminCod3r123') {
             req.session.user = username
             req.session.admin = false
@@ -47,6 +37,20 @@ router.post('/login', async (req, res) => {
         console.log(error)
     }
 })
+router.get('/faillogin', (req, res)=>{
+    res.send({status: 'error', message: 'fallo el login'})
+})
+
+router.post('/register', userVali, passport.authenticate('register', {failureRedirect: '/auth/failregister'}),  async (req, res)=>{
+    try {
+        res.send({status: 'ok', message: 'se registro correctamente'})
+    } catch (error) {
+        console.log(error)
+    }
+})
+router.get('/failregister', (req, res)=>{
+    res.send({status: 'error', message: 'fallo el registro'})
+})
 
 router.post('/logout', async (req, res) => {
     try {
@@ -59,22 +63,5 @@ router.post('/logout', async (req, res) => {
     }
 })
 
-router.post('/register', userVali, async (req, res)=>{
-    const { first_name, last_name, age, roll = 'user', email, password } = req.body
-    let user = { first_name, last_name, age, roll, email, password: createHash(password) }
-
-    try {
-        let exist = await mongoUserManager.getUser(email)
-        
-        if(exist) {
-            res.send({status:'error', message: 'El usuario ya existe'})
-        }else{
-            await mongoUserManager.addUser(user)
-            res.redirect('http://localhost:8080/auth')
-        }
-    } catch (error) {
-        console.log(error);
-    }
-})
 
 export default router
