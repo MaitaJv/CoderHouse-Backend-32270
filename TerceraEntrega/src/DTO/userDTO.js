@@ -19,4 +19,9 @@ export class UserDTO {
             password: user.password
         }
     }
+    async userByEmail(email){
+        return {
+            email: email
+        }
+    }
 }

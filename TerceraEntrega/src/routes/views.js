@@ -1,6 +1,7 @@
 import { Router } from "express"
 import { auth } from "../middleware/auth.js"
 import ViewsController from "../controllers/viewsController.js"
+import { rollAdminVerify, rollUserVerify } from "../middleware/rollVerify.js"
 
 const viewsController = new ViewsController
 
@@ -12,6 +13,6 @@ router.get('/carts/:cid', viewsController.cartsRender)
 
 router.get('/realtimeproducts', viewsController.realTimeProductsRender)
 
-router.get('/chat', viewsController.chat)
+router.get('/chat',rollUserVerify , viewsController.chat)
 
 export default router

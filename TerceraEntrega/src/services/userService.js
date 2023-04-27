@@ -25,7 +25,8 @@ class UserService {
 
     async getUser(email){
         try {
-            let user = await mongoUserManager.getUser(email)
+            let userEmail = await userDTO.userByEmail(email)
+            let user = await mongoUserManager.getUser(userEmail)
             return user
         } catch (error) {
             console.log(error)
