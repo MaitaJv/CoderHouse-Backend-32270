@@ -1,5 +1,5 @@
 import { request } from "express";
-
+import config  from '../config/env.js'
 class LoginController {
     loginRender = (req = request, res)=>{
         res.render('login')
@@ -22,7 +22,7 @@ class LoginController {
 
         try {
             
-            if (username !== 'adminCoder@coder.com' || password !== 'adminCod3r123') {
+            if (username !== config.adminName || password !== config.adminPassword) {
                 req.session.user = username
                 req.session.email = username
                 req.session.admin = false
