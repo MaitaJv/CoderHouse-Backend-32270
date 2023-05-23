@@ -53,4 +53,23 @@ export class MongoUserManager{
             console.log(error)
         }
     }
+
+    async updateRoll(email, roll){
+        try {
+            let user = await UserModel.updateOne(
+                {
+                    email: email
+                },
+                {
+                    $set:
+                    {
+                        'roll': roll
+                    }
+                }
+            )
+            return user
+        } catch (error) {
+            console.log(error)
+        }
+    }
 }

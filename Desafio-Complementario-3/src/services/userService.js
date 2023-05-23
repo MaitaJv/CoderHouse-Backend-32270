@@ -44,6 +44,15 @@ class UserService {
             console.log(error)
         }
     }
+
+    async updateRoll(email, roll){
+        try {
+            let user = await mongoUserManager.updateRoll(email, roll)
+            return user
+        } catch (error) {
+            console.log(error)
+        }
+    }
 }
 
 export default UserService

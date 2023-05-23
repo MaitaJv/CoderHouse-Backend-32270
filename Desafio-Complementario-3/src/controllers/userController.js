@@ -8,9 +8,20 @@ const userService = new UserService
 
 class UserController{
     rollSwitch = async (req = request, res) => {
-        req.session.premium = !req.session.premium
-        console.log(req.session.premium)
-        res.send({message: 'Roll Cambiado'})
+        const {uemail} = req.params
+        try {
+            let user = await userService.getUser(uemail)
+            if (!user) res.send({status: 'error', message: 'El usuario no existe'})
+
+            req.session.premium = !req.session.premium
+
+            let newUser = await userService.updateRoll(uemail, `${req.session.premium ? 'premium' : 'user'}`)
+            console.log(req.session.premium)
+            res.send({status: 'ok', data: newUser})
+            
+        } catch (error) {
+            
+        }
     }
 
     changePassword = async (req = request, res) => {
