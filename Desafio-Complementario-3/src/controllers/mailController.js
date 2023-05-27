@@ -31,7 +31,7 @@ export class MailController {
 
             let result = await transport.sendMail({
                 from:'Servicio de Node <javiermaita22@gmail.com>',
-                to: config.testMail,
+                to: email,
                 subject: 'Restablecer contraseña',
                 html: `
                 <div>
